@@ -26,6 +26,6 @@ SnapBank doesn't just stop at traditional banking features; it also integrates a
 
 ### 3. Home Page
 
-![Home Page](/Doc/Images/Home.png "Home Page")
+![Home Page](/Doc/Images/home.png "Home Page")
 
 - **User Dashboard**: Central hub for navigation within the application, displaying relevant information and options.
