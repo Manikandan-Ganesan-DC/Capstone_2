@@ -100,16 +100,12 @@ def chat_response(user_query):
 
 if __name__ == "__main__":
 
- 
-    # os.environ["OPENAI_API_KEY"]
-    # os.environ["OPENAI_API_KEY"] = "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"
     first = 0
     while True:
         if first == 0:
             print('Hello,how may I help you today')
             first+=1
         user_input = input('User : ')
-        # Exit condition
         if user_input.lower() == "quit":
             break
         print('Sentiment : ', sentiment_analysis(user_input))
