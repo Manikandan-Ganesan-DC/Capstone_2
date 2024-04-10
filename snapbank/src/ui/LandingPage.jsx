@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 //SVG
 import sign_up_img from ".././asserts/undraw_online_banking_re_kwqh.svg";
@@ -7,17 +8,22 @@ import sign_in_img from ".././asserts/undraw_savings_re_eq4w.svg";
 //CSS
 import "./LandingPage.css";
 
-// Navigate
-// const ProtectedRoute = ({ user, children }) => {
-//   if (!user) {
-//     return <Navigate to="/landing" replace />;
-//   }
-
-//   return children;
-// };
+//
+const baseURL = "http://localhost:4000";
+const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+const passPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 function LandingPage() {
   const navigate = useNavigate();
+
+  function isValidEmail(email) {
+    return emailPattern.test(email);
+  }
+
+  const isValidPass = (pass) => {
+    return passPattern.test(pass);
+  };
 
   function signUp() {
     document.querySelector(".container").classList.add("sign-up-mode");
@@ -27,28 +33,65 @@ function LandingPage() {
     document.querySelector(".container").classList.remove("sign-up-mode");
   }
 
-  function signInSubmit(event) {
+  async function signInSubmit(event) {
     event.preventDefault();
     console.log("signInSubmit..............");
 
     let signInEmail = document.getElementById("signInEmail").value;
     let signInPass = document.getElementById("signInPass").value;
 
-    navigate("/SnapBank");
+    if (isValidEmail(signInEmail)) {
+      const response = await axios.post(`${baseURL}/authenticateUser`, {
+        email: String(signInEmail).toLocaleLowerCase(),
+        password: signInPass,
+      });
+
+      console.log("Response data:", response.data);
+
+      // Check Notify
+      if (response.data["Op_State"] === "Success") {
+        localStorage.setItem("email", String(signInEmail).toLocaleLowerCase());
+        navigate("/SnapBank");
+        document.getElementById("sign-in-form").reset();
+      } else {
+        console.log("Failed");
+      }
+    } else {
+      console.log("Enter proper email");
+    }
 
     console.log(`signInEmail: ${signInEmail}`);
     console.log(`signInPass: ${signInPass}`);
   }
 
-  function signUpSubmit(event) {
+  async function signUpSubmit(event) {
     event.preventDefault();
     console.log("signUpSubmit..............");
 
     let signUpEmail = document.getElementById("signUpEmail").value;
     let signUpPass = document.getElementById("signUpPass").value;
 
-    console.log(`signInEmail: ${signUpEmail}`);
-    console.log(`signInPass: ${signUpPass}`);
+    try {
+      if (isValidPass(signUpPass) && isValidEmail(signUpEmail)) {
+        const response = await axios.post(`${baseURL}/createuser`, {
+          email: String(signUpEmail).toLocaleLowerCase(),
+          password: signUpPass,
+        });
+        console.log("Response data:", response.data);
+
+        // Check Notify
+        if (response.data["Op_State"] === "Success") {
+          console.log("Created");
+          document.getElementById("sign-up-form").reset();
+        } else {
+          console.log("Failed");
+        }
+      } else {
+        console.log("Enter proper email");
+      }
+    } catch (error) {
+      console.error("Error making POST request:", error.message);
+    }
   }
 
   return (
@@ -56,7 +99,7 @@ function LandingPage() {
       <div className="container">
         <div className="forms-container">
           <div className="signin-signup">
-            <form className="sign-in-form">
+            <form className="sign-in-form" id="sign-in-form">
               <h1 className=" font-semibold text-3xl">
                 Welcome to <span className="start_letter">SnapBank</span>
               </h1>
@@ -93,7 +136,7 @@ function LandingPage() {
                 className="btn solid"
               />
             </form>
-            <form className="sign-up-form">
+            <form className="sign-up-form" id="sign-up-form">
               <h1 className=" font-semibold text-3xl">
                 Sign up for <span className="start_letter">SnapBank</span>
               </h1>

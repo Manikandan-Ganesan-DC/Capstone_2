@@ -1,5 +1,5 @@
 {
-  "name": "snapbank",
+  "name": "mapmap",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,6 +13,7 @@
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.20.0",
     "react-scripts": "5.0.1",
+    "uuid": "^9.0.1",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^6.6.0",
     "workbox-broadcast-update": "^6.6.0",
