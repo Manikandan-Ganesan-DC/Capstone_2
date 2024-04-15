@@ -5,6 +5,8 @@ import random
 import warnings
 from dataclasses import dataclass
 
+# Mani
+from flask import Flask, redirect, request, url_for
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain.prompts import ChatPromptTemplate
@@ -19,15 +21,24 @@ abs_path = os.path.dirname(os.path.abspath(__file__))
 
 CHROMA_PATH = os.path.join(abs_path, "chroma")
 
-PROMPT_TEMPLATE = """
-Act as a banking Chatbot and Answer the question based only on the following Question and Answer context, 
-Please remember, you are the banking bot , so guide the customers accordingly. Your bank name is Snapbank:
+# PROMPT_TEMPLATE = """
+# Act as a banking Chatbot and Answer the question based only on the following Question and Answer context,
+# Please remember, you are the banking bot , so guide the customers accordingly. Your bank name is Snapbank:
 
+# {context}
+
+# ---
+
+# Answer the question based on the above context: {question}
+# """
+
+PROMPT_TEMPLATE = """
+Hello! As an AI developed by OpenAI, I'm serving as a banking assistant for Snapbank. I'm here to provide accurate responses to your banking inquiries.
+
+Relevant Information:
 {context}
 
----
-
-Answer the question based on the above context: {question}
+Now, let's address your question: {question}
 """
 
 
@@ -136,16 +147,40 @@ def chat_response(user_query):
     return response_text["response"]
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    first = 0
-    while True:
-        if first == 0:
-            print("Hello,how may I help you today")
-            first += 1
-        user_input = input("User : ")
-        if user_input.lower() == "quit":
-            break
-        print("Sentiment : ", sentiment_analysis(user_input))
-        print("Intent: ", intent_recognition(user_input))
-        print("Bot : ", chat_response(user_input))
+#     first = 0
+#     while True:
+#         if first == 0:
+#             print("Hello,how may I help you today")
+#             first += 1
+#         user_input = input("User : ")
+#         if user_input.lower() == "quit":
+#             break
+#         print("Sentiment : ", sentiment_analysis(user_input))
+#         print("Intent: ", intent_recognition(user_input))
+#         print("Bot : ", chat_response(user_input))
+
+
+app = Flask(__name__)
+
+
+@app.route("/Test", methods=["POST"])
+def chat():
+    if request.method == "POST":
+        user_input = request.get_json()["user_input"]
+        print(request.get_json())
+        response = chat_response(user_input)
+        intent = intent_recognition(user_input)
+        SA = sentiment_analysis(user_input)
+        return {
+            "chat_response": response,
+            "intent": intent,
+            "sentiment_analysis": SA,
+        }
+    else:
+        return "test"
+
+
+if __name__ == "__main__":
+    app.run(port=5000, host="0.0.0.0")
